@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
 
-// ⭐ Export authOptions so other API routes can use getServerSession()
+//  Export authOptions so other API routes can use getServerSession()
 export const authOptions = {
   session: { strategy: "jwt" },
 
@@ -64,8 +64,8 @@ export const authOptions = {
   },
 };
 
-// ⭐ Pass authOptions into NextAuth()
+//  Pass authOptions into NextAuth()
 const handler = NextAuth(authOptions);
 
-// ⭐ Export GET and POST handlers for Next.js App Router
+//  Export GET and POST handlers for Next.js App Router
 export { handler as GET, handler as POST };
