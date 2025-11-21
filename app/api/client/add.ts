@@ -1,34 +1,41 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
-import prisma from "../../../lib/prisma";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: Request) {
   try {
-    // 1️⃣ Verify user is logged in
-    const session = await getServerSession(req, res, authOptions);
+    // 1️⃣ Verify user session
+    const session = await getServerSession(authOptions);
+
     if (!session?.user?.email) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    // 2️⃣ Get user info
+    // 2️⃣ Find logged-in user
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
     }
 
-    // 3️⃣ Get client details from request body
-    const { name, email, phone, address } = req.body;
+    // 3️⃣ Read request body
+    const body = await req.json();
+    const { name, email, phone, address } = body;
 
     if (!name) {
-      return res.status(400).json({ error: "Client name is required" });
+      return NextResponse.json(
+        { error: "Client name is required" },
+        { status: 400 }
+      );
     }
 
     // 4️⃣ Create client
@@ -38,13 +45,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         email,
         phone,
         address,
-        user_id: user.id, // associate with logged-in user
+        user_id: user.id, // link to logged-in user
       },
     });
 
-    return res.status(201).json({ client: newClient });
+    return NextResponse.json(
+      { client: newClient },
+      { status: 201 }
+    );
+
   } catch (error) {
     console.error("Add Client Error:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

@@ -1,27 +1,34 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
-import prisma from "../../../lib/prisma";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: Request) {
   try {
-    // 1️⃣ Verify user is logged in
-    const session = await getServerSession(req, res, authOptions);
+    // 1️⃣ Verify session
+    const session = await getServerSession(authOptions);
+
     if (!session?.user?.email) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    // 2️⃣ Get user info
+    // 2️⃣ Get logged-in user
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-    if (!user) return res.status(404).json({ error: "User not found" });
 
-    // 3️⃣ Get Matter details from request body
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // 3️⃣ Parse request body
+    const body = await req.json();
     const {
       client_id,
       title,
@@ -32,19 +39,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       opposing_party,
       opposing_counsel,
       status,
-    } = req.body;
+    } = body;
 
     if (!client_id || !title || !case_type || !status) {
-      return res.status(400).json({ error: "Required fields missing" });
+      return NextResponse.json(
+        { error: "Required fields missing" },
+        { status: 400 }
+      );
     }
 
-    // 4️⃣ Verify client belongs to this user
+    // 4️⃣ Ensure client belongs to the user
     const client = await prisma.client.findFirst({
       where: { id: client_id, user_id: user.id },
     });
-    if (!client) return res.status(404).json({ error: "Client not found or does not belong to user" });
 
-    // 5️⃣ Create the Matter
+    if (!client) {
+      return NextResponse.json(
+        { error: "Client not found or does not belong to user" },
+        { status: 404 }
+      );
+    }
+
+    // 5️⃣ Create Matter
     const newMatter = await prisma.matter.create({
       data: {
         user_id: user.id,
@@ -60,9 +76,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    return res.status(201).json({ matter: newMatter });
+    return NextResponse.json(
+      { matter: newMatter },
+      { status: 201 }
+    );
+
   } catch (error) {
     console.error("Add Matter Error:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

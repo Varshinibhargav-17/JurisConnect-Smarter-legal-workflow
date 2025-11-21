@@ -1,25 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
-import prisma from "../../../lib/prisma"; // your Prisma client
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function PUT(req: Request) {
   try {
-    // 1️⃣ Get session to verify user is logged in
-    const session = await getServerSession(req, res, authOptions);
+    // 1️⃣ Verify user session
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    if (req.method !== "PUT") {
-      return res.status(405).json({ error: "Method not allowed" });
-    }
+    // 2️⃣ Parse request body
+    const body = await req.json();
+    const { name, phone, bar_enrollment_number, hourly_rate } = body;
 
-    // 2️⃣ Get fields from request body
-    const { name, phone, bar_enrollment_number, hourly_rate } = req.body;
-
-    // 3️⃣ Update user in database
+    // 3️⃣ Update user
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
       data: {
@@ -30,9 +30,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    return res.status(200).json({ user: updatedUser });
+    // 4️⃣ Return safe user response
+    const safeUser = {
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      bar_enrollment_number: updatedUser.bar_enrollment_number,
+      hourly_rate: updatedUser.hourly_rate,
+    };
+
+    return NextResponse.json(
+      { user: safeUser },
+      { status: 200 }
+    );
+
   } catch (error) {
     console.error("Update User Error:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
+
