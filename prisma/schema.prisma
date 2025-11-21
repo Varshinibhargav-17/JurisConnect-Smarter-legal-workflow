@@ -24,12 +24,10 @@ model User {
   phone                 String?
   bar_enrollment_number String?
   hourly_rate           Float?
-
-  // Relations
-  clients Client[]
-  matters Matter[]
-
-  created_at DateTime @default(now())
+  password              String  // ADD: Needed for email/password login
+  clients               Client[]
+  matters               Matter[]
+  created_at            DateTime @default(now())
 }
 
 /////////////////////////////////////////////////////
@@ -60,20 +58,18 @@ model Matter {
   client_id        Int
   title            String
   case_number      String?
-  case_type        String // civil, criminal, corporate
+  case_type        String
   court_name       String?
   judge_name       String?
   opposing_party   String?
   opposing_counsel String?
-  status           String // active, closed, on_hold
+  status           String
   created_at       DateTime @default(now())
-
-  // Relations
-  user       User        @relation(fields: [user_id], references: [id])
-  client     Client      @relation(fields: [client_id], references: [id])
-  courtDates CourtDate[]
-  tasks      Task[]
-  documents  Document[]
+  user             User     @relation(fields: [user_id], references: [id])
+  client           Client   @relation(fields: [client_id], references: [id])
+  courtDates       CourtDate[]
+  tasks            Task[]
+  documents        Document[]
 }
 
 /////////////////////////////////////////////////////
