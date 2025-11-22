@@ -1,10 +1,11 @@
-import NextAuth from "next-auth";
+import NextAuth, { type AuthOptions, type DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
+import { JWT } from "next-auth/jwt";
 
 //  Export authOptions so other API routes can use getServerSession()
-export const authOptions = {
+export const authOptions: AuthOptions = {
   session: { strategy: "jwt" },
 
   providers: [
@@ -52,13 +53,13 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: any }) {
       if (user) token.id = user.id;
       return token;
     },
 
-    async session({ session, token }) {
-      if (session.user) session.user.id = token.id;
+    async session({ session, token }: { session: any; token: JWT }) {
+      if (session.user) (session.user as any).id = token.id;
       return session;
     },
   },
