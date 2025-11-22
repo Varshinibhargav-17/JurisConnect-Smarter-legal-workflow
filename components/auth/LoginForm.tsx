@@ -5,25 +5,16 @@ import { useState } from 'react';
 
 export default function LoginForm() {
   const router = useRouter();
-  const [role, setRole] = useState('user');
+  // const [role, setRole] = useState('user'); // Dummy role selection removed
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd handle authentication here
-    // For now, we'll store the role in localStorage for simulation
-    localStorage.setItem('userRole', role);
-
-    switch (role) {
-      case 'admin':
-        router.push('/admin');
-        break;
-      case 'lawyer':
-        router.push('/lawyer');
-        break;
-      default:
-        router.push('/user');
-        break;
-    }
+    // This is a placeholder for actual authentication logic.
+    // In a real application, you would send credentials to a backend API for verification.
+    // Upon successful authentication, the backend would typically return a token and user role.
+    // For now, we'll redirect to a default dashboard as the dummy login is removed.
+    console.log('Login form submitted. Placeholder for backend authentication.');
+    router.push('/dashboard/home'); // Redirect to a default dashboard page
   };
 
   return (
@@ -41,7 +32,7 @@ export default function LoginForm() {
             id="email"
             type="email"
             required
-            defaultValue="test@example.com"
+            // defaultValue="test@example.com" // Removed dummy default value
             className="w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -56,25 +47,11 @@ export default function LoginForm() {
             id="password"
             type="password"
             required
-            defaultValue="password"
+            // defaultValue="password" // Removed dummy default value
             className="w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-            Login as
-          </label>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="user">User</option>
-            <option value="lawyer">Lawyer</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
+        {/* Role selection removed as per user request */}
         <button
           type="submit"
           className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -88,6 +65,11 @@ export default function LoginForm() {
           Sign up
         </Link>
       </p>
+      <div className="text-center mt-4">
+        <Link href="/" className="text-sm font-medium text-gray-600 hover:text-blue-600 hover:underline">
+          Back to main website
+        </Link>
+      </div>
     </div>
   );
 }

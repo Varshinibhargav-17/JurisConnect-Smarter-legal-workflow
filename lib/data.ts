@@ -1,6 +1,9 @@
 export const clients = [
-  { id: '1', name: 'John Doe', email: 'john@example.com', phone: '123-456-7890' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '098-765-4321' },
+  { id: '1', name: 'John Doe', email: 'john@example.com', phone: '123-456-7890', status: 'Active' },
+  { id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '098-765-4321', status: 'Active' },
+  { id: '3', name: 'Alice Johnson', email: 'alice@example.com', phone: '555-555-5555', status: 'Inactive' },
+  { id: '4', name: 'Bob Brown', email: 'bob@example.com', phone: '111-222-3333', status: 'Active' },
+  { id: '5', name: 'Charlie Davis', email: 'charlie@example.com', phone: '444-555-6666', status: 'Active' },
 ];
 
 export const cases = [
