@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String    @id @default(uuid())
+  name                  String
+  email                 String    @unique
+  password              String    // added password for auth
+  phone                 String?
+  bar_enrollment_number String?
+  hourly_rate           Float?
+  created_at            DateTime  @default(now())
+  
+  clients               Client[]
+  matters               Matter[]
+}
+
+model Client {
+  id         String    @id @default(uuid())
+  user_id    String
+  user       User      @relation(fields: [user_id], references: [id])
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+  created_at DateTime  @default(now())
+
+  matters    Matter[]
+  invoices   Invoice[]
+}
+
+model Matter {
+  id               String    @id @default(uuid())
+  user_id          String
+  user             User      @relation(fields: [user_id], references: [id])
+  client_id        String
+  client           Client    @relation(fields: [client_id], references: [id])
+  title            String
+  case_number      String?
+  case_type        String?
+  court_name       String?
+  judge_name       String?
+  opposing_party   String?
+  opposing_counsel String?
+  status           String    @default("Active") // Active, Closed, On Hold
+  created_at       DateTime  @default(now())
+
+  court_dates      CourtDate[]
+  tasks            Task[]
+  time_entries     TimeEntry[]
+  documents        Document[]
+  invoices         Invoice[]
+}
+
+model CourtDate {
+  id             String    @id @default(uuid())
+  matter_id      String
+  matter         Matter    @relation(fields: [matter_id], references: [id])
+  date           DateTime
+  time           String?
+  purpose        String?
+  court_room     String?
+  notes          String?
+  reminder_sent  Boolean   @default(false)
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  matter_id   String
+  matter      Matter   @relation(fields: [matter_id], references: [id])
+  title       String
+  description String?
+  due_date    DateTime?
+  priority    String   @default("Medium") // Low, Medium, High, Critical
+  status      String   @default("Pending") // Pending, Completed
+  created_at  DateTime @default(now())
+}
+
+model TimeEntry {
+  id          String   @id @default(uuid())
+  matter_id   String
+  matter      Matter   @relation(fields: [matter_id], references: [id])
+  date        DateTime
+  hours       Float
+  description String?
+  billable    Boolean  @default(true)
+  rate        Float?
+  created_at  DateTime @default(now())
+}
+
+model Document {
+  id          String   @id @default(uuid())
+  matter_id   String
+  matter      Matter   @relation(fields: [matter_id], references: [id])
+  file_name   String
+  file_url    String
+  file_type   String?
+  uploaded_at DateTime @default(now())
+}
+
+model Invoice {
+  id             String    @id @default(uuid())
+  matter_id      String?
+  matter         Matter?    @relation(fields: [matter_id], references: [id])
+  client_id      String
+  client         Client    @relation(fields: [client_id], references: [id])
+  invoice_number String
+  amount         Float
+  gst_amount     Float
+  total_amount   Float
+  status         String    @default("Draft") // Draft, Sent, Paid, Overdue
+  due_date       DateTime?
+  paid_date      DateTime?
+  created_at     DateTime  @default(now())
+
+  items          InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoice_id  String
+  invoice     Invoice  @relation(fields: [invoice_id], references: [id])
+  description String
+  hours       Float?
+  rate        Float?
+  amount      Float
+}

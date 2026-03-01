@@ -1,0 +1,51 @@
+﻿npx : C:\Jurisconnect\backend\node_modules\@prisma\client\src\r
+untime\getPrismaClient.ts:260
+At line:1 char:1
++ npx ts-node seed.ts 2>&1 | Out-File -Encoding utf8 err.log
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Jurisconnect.. 
+   .maClient.ts:260:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+        throw new PrismaClientInitializationError(
+              ^
+PrismaClientInitializationError: `PrismaClient` needs to be 
+constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t (C:\Jurisconnect\backend\node_modules\@prisma\clie
+nt\src\runtime\getPrismaClient.ts:260:15)
+    at Object.<anonymous> 
+(C:\Jurisconnect\backend\seed.ts:3:16)
+    at Module._compile 
+(node:internal/modules/cjs/loader:1521:14)
+    at Module.m._compile (C:\Jurisconnect\backend\node_modules\
+ts-node\src\index.ts:1618:23)
+    at Module._extensions..js 
+(node:internal/modules/cjs/loader:1623:10)
+    at Object.require.extensions.<computed> [as .ts] (C:\Jurisc
+onnect\backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Function.Module._load 
+(node:internal/modules/cjs/loader:1091:12)
+    at Function.executeUserEntryPoint [as runMain] 
+(node:internal/modules/run_main:164:12)
+    at phase4 (C:\Jurisconnect\backend\node_modules\ts-node\src
+\bin.ts:649:14) {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined
+}
